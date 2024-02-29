@@ -1,16 +1,21 @@
 <?php
 include 'config.php';
 
-$id = $_POST['id'];
+$kode_pel = $_POST['kode_pel'];
+$nama = $_POST['nama'];
+$alamat = $_POST['alamat'];
+$alamat2 = $_POST['alamat2'];
+$no_hp = $_POST['no_hp'];
+$keterangan = $_POST['keterangan'];
 $status = $_POST['status'];
 
-$sql = "UPDATE customer SET status = ? WHERE id = ?";
+$sql = "INSERT INTO customer (kode_pel, nama, alamat, alamat2, no_hp, keterangan, status) VALUES (?, ?, ?, ?, ?, ?, ?)";
 $stmt = $conn->prepare($sql);
-$stmt->bind_param("si", $status, $id);
+$stmt->bind_param("sssssss", $kode_pel, $nama, $alamat, $alamat2, $no_hp, $keterangan, $status);
 $stmt->execute();
 
 // Fetch all rows
-$sql = "SELECT * FROM customer";
+$sql = "SELECT id, kode_pel, nama, alamat, alamat2, no_hp, keterangan, status FROM customer";
 $stmt = $conn->prepare($sql);
 $stmt->execute();
 $result = $stmt->get_result();

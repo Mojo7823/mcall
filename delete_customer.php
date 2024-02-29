@@ -1,20 +1,33 @@
 <?php
 include 'config.php';
 
-$id = $_POST['id'];
-$status = $_POST['status'];
+if (!isset($_POST['id'])) {
+    die('No ID provided for deletion');
+}
 
-$sql = "UPDATE customer SET status = ? WHERE id = ?";
+$id = $_POST['id'];
+
+$sql = "DELETE FROM customer WHERE id = ?";
 $stmt = $conn->prepare($sql);
-$stmt->bind_param("si", $status, $id);
-$stmt->execute();
+
+if ($stmt === false) {
+    die('Failed to prepare the SQL query');
+}
+
+$stmt->bind_param("s", $id); // Change "i" to "s"
+$executionResult = $stmt->execute();
+
+if ($executionResult === false) {
+    die('Failed to execute the SQL query');
+}
 
 // Fetch all rows
-$sql = "SELECT * FROM customer";
+$sql = "SELECT id,kode_pel, nama, alamat, alamat2, no_hp, keterangan, status FROM customer";
 $stmt = $conn->prepare($sql);
 $stmt->execute();
 $result = $stmt->get_result();
 $rows = $result->fetch_all(MYSQLI_ASSOC);
+
 
 // Notify the WebSocket server about the update
 $ch = curl_init('http://localhost:8080/update');

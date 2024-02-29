@@ -31,23 +31,19 @@
 
     <div class="row justify-content-center mb-3">
         <div class="col-auto">
-            <!-- Add id="prev-button" here -->
             <button id="prev-button" type="button" class="btn btn-warning btn-lg">Sebelumnya<i class="fa-solid fa-right-long"></i></button>
         </div>
         <div class="col-auto">
-            <!-- Add id="next-button" here -->
             <button id="next-button" type="button" class="btn btn-warning btn-lg">Berikutnya<i class="fa-solid fa-right-long"></i></button>
         </div>
     </div>
 
     <div class="row justify-content-center">
         <div class="col-auto">
-            <!-- Add id="prev-button" here -->
-            <button id="prev-button" type="button" class="btn btn-primary btn-lg">Tambah Pelanggan<i class="fa-solid fa-right-long"></i></button>
+            <button id="add-button" type="button" class="btn btn-primary btn-lg">Tambah Pelanggan<i class="fa-solid fa-right-long"></i></button>
         </div>
         <div class="col-auto">
-            <!-- Add id="next-button" here -->
-            <button id="next-button" type="button" class="btn btn-danger btn-lg">Hapus Pelanggan<i class="fa-solid fa-right-long"></i></button>
+            <button id="remove-button" type="button" class="btn btn-danger btn-lg">Hapus Pelanggan<i class="fa-solid fa-right-long"></i></button>
         </div>
     </div>
 </div>
@@ -61,6 +57,7 @@
                 <thead>
                     <tr>
                         <th scope="col">No</th>
+                        <th scope="col">Kode Pelanggan</th>
                         <th scope="col">Nama Pelanggan</th>
                         <th scope="col">Alamat</th>
                         <th scope="col">No HP</th>
@@ -70,26 +67,29 @@
                 </thead>
                 <tbody>
                 <?php
-                    $sql = "SELECT id, nama, alamat, alamat2, no_hp, keterangan, status FROM customer";
+                    $sql = "SELECT id,kode_pel,nama, alamat, alamat2, no_hp, keterangan, status FROM customer";
                     $result = $conn->query($sql);
 
                     if ($result->num_rows > 0) {
-                    // output data of each row
-                    while($row = $result->fetch_assoc()) {
-                        echo "<tr class='customer-row' data-full-address='" . $row["alamat2"] . "' data-keterangan='" . $row["keterangan"] . "'>";
-                        echo "<th scope='row'>" . $row["id"] . "</th>";
-                        echo "<td>" . $row["nama"] . "</td>";
-                        echo "<td>" . $row["alamat"] . "</td>";
-                        echo "<td>" . $row["no_hp"] . "</td>";
-                        echo "<td>" . $row["status"] . "</td>";
-                        echo "<td><button type='button' class='btn btn-warning show-modal-button'><i class='fas fa-clipboard-check'></i></button></td>";
-                        echo "</tr>";
-                    }
+                        // output data of each row
+                        $no = 1; // Initialize counter
+                        while($row = $result->fetch_assoc()) {
+                            echo "<tr class='customer-row' data-id='" . $row["id"] . "' data-full-address='". $row["alamat2"] . "' data-keterangan='" . $row["keterangan"] . "' data-id='" . $row["id"] . "'>";
+                            echo "<th scope='row'>" . $no . "</th>"; // Display counter instead of id
+                            echo "<td>" . $row["kode_pel"] . "</td>";
+                            echo "<td>" . $row["nama"] . "</td>";
+                            echo "<td>" . $row["alamat"] . "</td>";
+                            echo "<td>" . $row["no_hp"] . "</td>";
+                            echo "<td>" . $row["status"] . "</td>";
+                            echo "<td><button type='button' class='btn btn-warning show-modal-button'><i class='fas fa-clipboard-check'></i></button></td>";
+                            echo "</tr>";
+                            $no++; // Increment counter
+                        }
                     } else {
-                    echo "0 results";
+                        echo "0 results";
                     }
                     $conn->close();
-                    ?>
+                ?>
                 </tbody>
             </table>
         </div>
