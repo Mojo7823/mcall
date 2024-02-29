@@ -204,34 +204,38 @@ $('#change-status-button').click(function (event) {
     if (selected.length === 0) {
         event.preventDefault();
     } else {
-        var id = selected.find('th:nth-child(1)').text();
-
         Swal.fire({
-            title: 'Change Status',
+            title: 'Ganti Status',
             input: 'text',
-            inputPlaceholder: 'Enter new status',
+            inputPlaceholder: 'Masukkan status baru',
             showCancelButton: true,
             confirmButtonText: 'Kirim',
             cancelButtonText: 'Tutup',
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $.ajax({
-                    url: 'change_status.php',
-                    type: 'POST',
-                    data: {
-                        id: id,
-                        status: result.value
-                    },
-                    success: function(response) {
-                        Swal.fire('Success', 'Status updated successfully', 'success');
-                        location.reload(); // Reload the page to update the status in the table
-                    },
-                    error: function(jqXHR, textStatus, errorThrown) {
-                        Swal.fire('Error', 'Failed to update status', 'error');
-                    }
+            preConfirm: function (status) {
+                return new Promise(function (resolve, reject) {
+                    $.ajax({
+                        url: 'update_status.php',
+                        type: 'POST',
+                        data: {
+                            id: selected.find('th').text(),
+                            status: status
+                        },
+                        success: function () {
+                            selected.find('td:nth-child(5)').text(status);
+                            resolve();
+                        },
+                        error: function () {
+                            reject('Error updating status');
+                        }
+                    });
                 });
+            }
+        }).then(function (result) {
+            if (result.isConfirmed) {
+                Swal.fire('Updated!', 'The status has been updated.', 'success');
             }
         });
     }
 });
+
 </script>
