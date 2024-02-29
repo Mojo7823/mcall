@@ -22,7 +22,7 @@
             <a id="whatsapp-button" href="#" target="_blank" class="btn btn-success btn-lg">Panggil Whatsapp &nbsp; &nbsp; <i class="fab fa-whatsapp"></i></a>
         </div>
         <div class="col-auto">
-            <a id="broadcast-button" href="#" target="_blank" class="btn btn-info btn-lg">Kirim Broadcast &nbsp; &nbsp; <i class="far fa-comment-dots"></i></a>
+            <a id="broadcast-button" href="#" class="btn btn-info btn-lg">Kirim Broadcast &nbsp; &nbsp; <i class="far fa-comment-dots"></i></a>
         </div>
         <div class="col-auto">
             <a id="change-status-button" href="#" class="btn btn-secondary btn-lg">Ganti Status &nbsp; &nbsp; <i class="fas fa-cog"></i></a>

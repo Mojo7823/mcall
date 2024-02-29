@@ -1,6 +1,7 @@
 $(document).ready(function () {
-    var ws = new WebSocket('ws://localhost:8080');
     $('.table').DataTable();
+    
+    var ws = new WebSocket('ws://localhost:8080');
     ws.onmessage = function(event) {
         var data = JSON.parse(event.data);
         if (!Array.isArray(data)) {
@@ -23,9 +24,59 @@ $(document).ready(function () {
             tr.data('keterangan', row.keterangan);
             tr.data('id', row.id);
             tbody.append(tr);
-            counter++; // Increment counter
+            counter++;
+        });
+        // Highlight the selected row after data update
+        $('.customer-row').each(function() {
+            if ($(this).find('th').text() === selectedId) {
+                $(this).addClass('selected');
+            }
         });
     };
+
+    $('#broadcast-button').click(function (event) {
+        event.preventDefault(); // Prevent the default action
+    
+        var selectedRow = $('.customer-row.selected');
+        if (selectedRow.length === 0) {
+            // No row is selected
+            return;
+        }
+    
+        var phoneNumber = selectedRow.find('td:nth-child(5)').text(); // Get the phone number from the 5th column of the selected row
+    
+        Swal.fire({
+            title: 'Kirim Broadcast',
+            html: `
+                <textarea id="swal-input1" class="swal2-textarea" placeholder="Enter your message" style="height: 200px;"></textarea>
+                <button id="add-template-button" class="swal2-confirm swal2-styled" style="display: inline-block;">Tambah Template</button>
+                <button id="select-template-button" class="swal2-confirm swal2-styled" style="display: inline-block;">Pilih Template</button>
+            `,
+            focusConfirm: false,
+            showCancelButton: true,
+            confirmButtonText: 'Kirim Broadcast',
+            onBeforeOpen: () => {
+                Swal.getPopup().querySelector('#add-template-button').onclick = function() {
+                    // Handle the click event of the "Tambah Template" button
+                }
+                Swal.getPopup().querySelector('#select-template-button').onclick = function() {
+                    // Handle the click event of the "Pilih Template" button
+                }
+            },
+            preConfirm: () => {
+                return document.getElementById('swal-input1').value
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Handle the click event of the "Kirim Broadcast" button
+                var message = result.value;
+                var encodedMessage = encodeURIComponent(message);
+                var whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+                window.open(whatsappUrl, '_blank'); // Open the WhatsApp URL in a new tab
+            }
+        });
+    });
+
 
     $('#change-status-button').click(function (event) {
         var selected = $('.customer-row.selected');
@@ -45,11 +96,11 @@ $(document).ready(function () {
                             url: 'update_status.php',
                             type: 'POST',
                             data: {
-                                id: selected.find('th').text(),
+                                id: selected.data('id'), 
                                 status: status
                             },
                             success: function () {
-                                selected.find('td:nth-child(5)').text(status);
+                                selected.find('td:nth-child(6)').text(status);
                                 $('#highlight-customer').html('Nama: ' + selected.find('td:nth-child(3)').text() + '<br>Alamat: ' + selected.find('td:nth-child(4)').text() + '<br>No Hp: ' + selected.find('td:nth-child(5)').text() + '<br>Status: ' + status);
                                 resolve();
                             },
@@ -62,17 +113,11 @@ $(document).ready(function () {
             }).then(function (result) {
                 if (result.isConfirmed) {
                     Swal.fire('Updated!', 'The status has been updated.', 'success');
+                    ws.send('refresh'); // Request the server to send updated data
                 }
             });
         }
     });
-
-
-
-
-
-
-
 
     $('body').on('click', '#remove-button', function () {
         var selected = $('.customer-row.selected');
@@ -215,9 +260,9 @@ $('#add-button').click(function () {
             <input id="swal-input7" class="swal2-input" placeholder="Status">
         `,
         focusConfirm: false,
-        showCancelButton: true, // This will show the cancel button
-        confirmButtonText: 'Tambahkan', // This will change the text of the confirm button
-        cancelButtonText: 'Batal', // This will change the text of the cancel button
+        showCancelButton: true,
+        confirmButtonText: 'Tambahkan',
+        cancelButtonText: 'Batal',
         preConfirm: () => {
             return [
                 document.getElementById('swal-input1').value,
